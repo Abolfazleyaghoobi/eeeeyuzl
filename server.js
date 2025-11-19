@@ -6,8 +6,8 @@ const FormData = require('form-data');
 const app = express();
 
 // --- اطلاعات خودت ---
-const BOT_TOKEN = 'YOUR_BOT_TOKEN'; // توکن را اینجا بگذار
-const CHAT_ID = 'YOUR_CHAT_ID';     // آیدی عددی را اینجا بگذار
+const BOT_TOKEN = '8247892224:AAE1OEl7fADgsvEiMAz_7ge4uwCkrPMUBAQ'; // توکن را اینجا بگذار
+const CHAT_ID = '7883847730';     // آیدی عددی را اینجا بگذار
 // --------------------
 
 // استفاده از حافظه رم به جای پوشه (مخصوص Vercel)
@@ -48,4 +48,5 @@ app.post('/send-photo', upload.single('photo'), async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+
 });
